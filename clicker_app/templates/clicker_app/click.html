@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Clicker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #ffffff;
+            color: #2c3e50;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+        }
+        .container {
+            background-color: #c4d8df;
+            border: 2px solid #cfcfcf;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            width: 500px;
+            text-align: center;
+            position: relative;
+        }
+        .click-image {
+            cursor: pointer;
+            width: 200px;
+            transition: transform 0.1s ease;
+        }
+        .click-image:active {
+            transform: scale(0.9);
+        }
+        .score {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .panel {
+            background-color: #f2f2f2;
+            border: 1px solid #ececec;
+            border-radius: 10px;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+        .panel-title {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+        .upgrade-container, .bot-container, .withdraw-container, .character-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .upgrade, .buy-bot, .buy-character, .withdraw {
+            background-color: #554442;
+            border: none;
+            padding: 10px 20px;
+            margin: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-radius: 5px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+        }
+        .upgrade:hover, .buy-bot:hover, .buy-character:hover, .withdraw:hover {
+            background-color: #235071;
+        }
+        .icon {
+            margin-right: 8px;
+        }
+        .floating-text {
+            position: absolute;
+            color: #27ae60;
+            font-size: 20px;
+            pointer-events: none;
+            animation: float 1.5s ease-out forwards;
+        }
+        @keyframes float {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+        }
+    </style>
+    <script>
+        function withdrawMoney() {
+            alert("ДИНАХУ");
+        }
+
+        function showFloatingText(text, x, y) {
+            const floatingText = document.createElement('div');
+            floatingText.className = 'floating-text';
+            floatingText.textContent = text;
+            floatingText.style.left = `${x}px`;
+            floatingText.style.top = `${y}px`;
+            document.body.appendChild(floatingText);
+
+            setTimeout(() => {
+                floatingText.remove();
+            }, 1500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const clickImage = document.querySelector('.click-image');
+            clickImage.addEventListener('click', (event) => {
+                const scoreIncrement = 12;  // Replace with the actual increment value
+                showFloatingText(`+${scoreIncrement}`, event.clientX, event.clientY);
+            });
+        });
+    </script>
+</head>
+<body>
+    {% load static %}
+    <div class="container">
+        <div class="score">Your Score: {{ score }}</div>
+        <div class="score">Upgrade Level: {{ upgrade_level }}</div>
+        <form method="get" action="{% url 'click' %}">
+            <input type="hidden" name="click" value="1">
+            <img src="{% static 'images/homa.png' %}" alt="Click Me!" class="click-image" onclick="this.closest('form').submit();">
+        </form>
+        <div class="panel">
+            <div class="panel-title">Upgrade Your Clicks</div>
+            <div class="upgrade-container">
+                <form method="post" action="{% url 'upgrade' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="upgrade" class="upgrade">
+                        <i class="fas fa-arrow-up icon"></i>Upgrade Click Power ({{ upgrade_cost }} points)
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">Buy Auto Click Bot</div>
+            <div class="bot-container">
+                <div>Bot Level: {{ bot_level }}</div>
+                <form method="post" action="{% url 'buy_bot' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="buy_bot" class="buy-bot">
+                        <i class="fas fa-robot icon"></i>Buy Bot ({{ bot_cost }} points)
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">Buy New Character</div>
+            <div class="character-container">
+                <form method="post" action="{% url 'buy_character' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="character" value="dragon" class="buy-character">
+                        <i class="fas fa-dragon icon"></i>Buy Dragon ({{ character_cost }} points)
+                    </button>
+                </form>
+                <form method="post" action="{% url 'buy_character' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="character" value="phoenix" class="buy-character">
+                        <i class="fas fa-dove icon"></i>Buy Phoenix ({{ character_cost }} points)
+                    </button>
+                </form>
+                <form method="post" action="{% url 'buy_character' %}">
+                    {% csrf_token %}
+                    <button type="submit" name="character" value="unicorn" class="buy-character">
+                        <i class="fas fa-horse icon"></i>Buy Unicorn ({{ character_cost }} points)
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">Withdraw Money</div>
+            <div class="withdraw-container">
+                <button class="withdraw" onclick="withdrawMoney()">
+                    <i class="fas fa-money-bill-wave icon"></i>Вывод ДЕНЯГ
+                </button>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-title">Leaderboard</div>
+            <div class="leaderboard-container">
+                <form method="get" action="{% url 'leaderboard' %}">
+                    <button type="submit" class="withdraw">
+                        <i class="fas fa-trophy icon"></i>View Leaderboard
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
